@@ -675,6 +675,13 @@ require('lazy').setup {
     end,
   },
 
+  {
+    'stevearc/oil.nvim',
+    opts = {},
+    -- Optional dependencies
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+  },
+
   -- .md headlines
   { 'lukas-reineke/headlines.nvim', lazy = false, dependencies = { 'nvim-treesitter/nvim-treesitter' }, config = true },
 
