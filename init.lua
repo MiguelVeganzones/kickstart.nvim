@@ -769,10 +769,201 @@ require('lazy').setup {
     opts = {},
     -- Optional dependencies
     dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('oil').setup {
+        default_file_explorer = true,
+      }
+    end,
+  },
+
+  {
+    'lervag/vimtex',
+    lazy = false, -- we don't want to lazy load VimTeX
+    -- tag = "v2.15", -- uncomment to pin to a specific release
+    init = function()
+      -- VimTeX configuration goes here
+    end,
+  },
+
+  {
+    'danymat/neogen',
+    -- Uncomment next line if you want to follow only stable versions
+    -- version = "*"
+    config = function()
+      require('neogen').setup {
+        vim.api.nvim_set_keymap('n', '<Leader>nf', ":lua require('neogen').generate()<CR>", { noremap = true, silent = true }),
+        languages = {
+          ['cpp.doxygen'] = require 'neogen.configurations.cpp',
+          ['python.numpydoc'] = require 'neogen.configurations.python',
+        },
+      }
+    end,
   },
 
   -- .md headlines
-  { 'lukas-reineke/headlines.nvim', lazy = false, dependencies = { 'nvim-treesitter/nvim-treesitter' }, config = true },
+  {
+    'lukas-reineke/headlines.nvim',
+    lazy = false,
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    config = function()
+      vim.cmd [[highlight Headline1 guibg=#1e2718]]
+      vim.cmd [[highlight Headline2 guibg=#21262d]]
+      vim.cmd [[highlight CodeBlock guibg=#1c1c1c]]
+      vim.cmd [[highlight Dash guibg=#D19A66 gui=bold]]
+
+      require('headlines').setup {
+        org = {
+          headline_highlights = { 'Headline1', 'Headline2' },
+        },
+      }
+    end,
+  },
+
+  --  {
+  --    'mfussenegger/nvim-dap',
+  --    config = function()
+  --      -- Important: We must define ``require("dap")`` at least once.
+  --      -- Otherwise the ``DapBreakpoint`` sign won't be available for
+  --      -- another plug-in, ``Weissle/persistent-breakpoints.nvim``, to
+  --      -- refer to + use.
+  --      --
+  --      local dap = require 'dap'
+  --
+  --      -- Reference: https://github.com/mfussenegger/nvim-dap/wiki/C-C---Rust-(gdb-via--vscode-cpptools)#ccrust-gdb-via--vscode-cpptools
+  --      dap.adapters.cppdbg = {
+  --        id = 'cppdbg',
+  --        type = 'executable',
+  --        command = '~/sources/cpptools-linux/extension/debugAdapters/bin/OpenDebugAD7',
+  --      }
+  --
+  --      vim.keymap.set('n', '<leader>d<space>', ':DapContinue<CR>', { desc = 'Continue through the debugger to the next breakpoint.' })
+  --      vim.keymap.set('n', '<leader>dl', ':DapStepInto<CR>', { desc = 'Move into a function call.' })
+  --      vim.keymap.set('n', '<leader>dj', ':DapStepOver<CR>', { desc = 'Skip over the current line.' })
+  --      vim.keymap.set('n', '<leader>dh', ':DapStepOut<CR>', { desc = 'Move out of the current function call.' })
+  --      vim.keymap.set('n', '<leader>dx', function()
+  --        require('dap').run_to_cursor()
+  --      end, { desc = 'Run to [d]ebug cursor to [x] marks the spot.' })
+  --      vim.keymap.set('n', '<leader>dz', ':ZoomWinTabToggle<CR>', { desc = '[d]ebugger [z]oom toggle (full-screen or minimize the window).' })
+  --      vim.keymap.set('n', '<leader>dgt', ":lua require('dap').set_log_level('TRACE')<CR>", { desc = 'Set [d]ebu[g] to [t]race level logging.' })
+  --      vim.keymap.set('n', '<leader>dge', function()
+  --        vim.cmd(':edit ' .. vim.fn.stdpath 'cache' .. '/dap.log')
+  --      end, { desc = 'Open the [d]ebu[g] [e]dit file.' })
+  --      vim.keymap.set('n', '<F12>', ':DapStepOut<CR>', { desc = 'Move out of the current function call.' })
+  --      vim.keymap.set('n', '<F10>', ':DapStepOver<CR>', { desc = 'Skip over the current line.' })
+  --      vim.keymap.set('n', '<F11>', ':DapStepInto<CR>', { desc = 'Move into a function call.' })
+  --      vim.keymap.set('n', '<leader>d-', function()
+  --        require('dap').restart { terminateDebugee = false }
+  --      end, { desc = 'Restart the current debug session.' })
+  --      vim.keymap.set('n', '<leader>d_', function()
+  --        require('dap').terminate()
+  --        require('dapui').close()
+  --      end, { desc = 'Kill the current debug session.' })
+  --      -- vim.keymap.set("n", "<leader>dv", ":call GoToWindow(g:vimspector_session_windows.variables)<CR>")
+  --      -- vim.keymap.set("n", "<leader>ds", ":call GoToWindow(g:vimspector_session_windows.stack_trace)<CR>")
+  --    end,
+  --    lazy = true,
+  --    version = '0.*',
+  --  },
+  --
+  --  -- A default "GUI" front-end for nvim-dap
+  --  {
+  --    'ColinKennedy/nvim-dap-ui',
+  --    config = function()
+  --      require('dapui').setup()
+  --
+  --      vim.keymap.set('n', '<F6>', function()
+  --        require('dap').terminate()
+  --        require('dapui').close()
+  --      end, { desc = 'Close the DAP and the GUI.' })
+  --
+  --      local _get_window_by_type = function(type_name)
+  --        for _, data in pairs(vim.fn.getwininfo()) do
+  --          if vim.api.nvim_buf_get_option(data.bufnr, 'filetype') == type_name then
+  --            return data
+  --          end
+  --        end
+  --
+  --        return nil
+  --      end
+  --
+  --      local _zoom_by_type = function(type_name)
+  --        local data = _get_window_by_type(type_name)
+  --
+  --        if data == nil then
+  --          print 'No buffer could be found.'
+  --
+  --          return
+  --        end
+  --
+  --        if vim.fn.exists 't:zoomwintab' == 1 then
+  --          -- The window is already zoomed in. Zoom out first
+  --          vim.cmd [[ZoomWinTabOut]]
+  --
+  --          if data.winnr == vim.fn.winnr() then
+  --            -- Returning early effectively allows us to "toggle"
+  --            -- the zoom mapping. e.g. Pressing ``<leader>dw`` zooms
+  --            -- into the Watchers window. Pressing ``<leader>dw``
+  --            -- again will "zoom out".
+  --            --
+  --            return
+  --          end
+  --        end
+  --
+  --        vim.fn.win_gotoid(data.winid)
+  --
+  --        vim.cmd [[ZoomWinTabToggle]]
+  --      end
+  --
+  --      local add_zoom_keymap = function(mapping, type_name)
+  --        vim.keymap.set('n', mapping, function()
+  --          _zoom_by_type(type_name)
+  --        end, { desc = 'Toggle-full-screen the ' .. type_name .. ' DAP window.' })
+  --      end
+  --
+  --      add_zoom_keymap('<leader>dc', 'dapui_console')
+  --      add_zoom_keymap('<leader>dw', 'dapui_watches')
+  --      add_zoom_keymap('<leader>ds', 'dapui_scopes')
+  --      add_zoom_keymap('<leader>dt', 'dapui_stacks') -- dt as in s[t]acks
+  --      add_zoom_keymap('<leader>dr', 'dap-repl')
+  --    end,
+  --    dependencies = {
+  --      'mfussenegger/nvim-dap',
+  --      'nvim-neotest/nvim-nio',
+  --      'theHamsta/nvim-dap-virtual-text', -- Optional dependency for virtual text
+  --    },
+  --    keys = { '<F5>' },
+  --  },
+  --
+  --  -- Adds the current value(s) of variables as you step through the code. Super handy!
+  --  {
+  --    'theHamsta/nvim-dap-virtual-text',
+  --    config = function()
+  --      require('nvim-dap-virtual-text').setup()
+  --    end,
+  --    dependencies = { 'mfussenegger/nvim-dap', 'nvim-treesitter/nvim-treesitter' },
+  --    lazy = true,
+  --  },
+  --
+  --  -- TODO: Defer-load this plug-in
+  --  -- TODO: Make sure that debugpy is installed. Otherwise, disable
+  --  -- Reference: https://github.com/mfussenegger/nvim-dap-python#installation
+  --  --
+  --
+  --  -- Remember nvim-dap breakpoints between sessions, using ``:PBToggleBreakpoint``
+  --  {
+  --    'Weissle/persistent-breakpoints.nvim',
+  --    config = function()
+  --      require('persistent-breakpoints').setup {
+  --        load_breakpoints_event = { 'BufReadPost' },
+  --      }
+  --
+  --      vim.keymap.set('n', '<leader>db', ':PBToggleBreakpoint<CR>', { desc = 'Set a breakpoint (and remember it even when we re-open the file).' })
+  --
+  --      require('persistent-breakpoints.api').load_breakpoints()
+  --    end,
+  --    dependencies = { 'mfussenegger/nvim-dap' },
+  --    keys = { '<leader>db' },
+  --  },
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
