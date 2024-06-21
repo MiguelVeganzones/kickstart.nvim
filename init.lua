@@ -699,6 +699,9 @@ require('lazy').setup {
       dap.configurations.c = dap.configurations.cpp
 
       -- nvim-dap keymaps
+      vim.keymap.set('n', '<Leader>dk', function()
+        require('dap').disconnect { terminateDebuggee = true }
+      end)
       vim.keymap.set('n', '<F5>', function()
         require('dap').continue()
       end)
