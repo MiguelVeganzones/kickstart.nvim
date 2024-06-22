@@ -677,8 +677,18 @@ require('lazy').setup {
 
   {
     'mfussenegger/nvim-dap',
+    dependencies = {
+      'rcarriga/nvim-dap-ui',
+      'theHamsta/nvim-dap-virtual-text',
+      'nvim-neotest/nvim-nio',
+      'williamboman/mason.nvim',
+    },
     config = function()
       local dap = require 'dap'
+      local dapui = require 'dapui'
+
+      dapui.setup()
+
       dap.adapters.gdb = {
         type = 'executable',
         command = 'gdb',
@@ -690,8 +700,12 @@ require('lazy').setup {
           type = 'gdb',
           request = 'launch',
           program = function()
-            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+            --return vim.fn.input('Path to executable: ', vim.cmd ':f' .. '/', 'file')
+            vim.cmd ':wa'
+            vim.cmd(':! make ' .. vim.fn.expand '%:t:r')
+            return vim.fn.expand '%:p:h' .. '/bin/debug/' .. vim.fn.expand '%:t:r' .. '.o'
           end,
+          --           program = '${fileWorkspaceFolder}/bin/debug/${fileBaseNameNoExtension}.o',
           cwd = '${workspaceFolder}',
           stopAtBeginningOfMainSubprogram = false,
         },
@@ -699,71 +713,29 @@ require('lazy').setup {
       dap.configurations.c = dap.configurations.cpp
 
       -- nvim-dap keymaps
-      vim.keymap.set('n', '<Leader>dk', function()
-        require('dap').disconnect { terminateDebuggee = true }
+      vim.keymap.set('n', '<leader>dk', function()
+        dap.disconnect { terminateDebuggee = true }
       end)
-      vim.keymap.set('n', '<F5>', function()
-        require('dap').continue()
+      vim.keymap.set('n', '<F5>', dap.continue)
+      vim.keymap.set('n', '<F10>', dap.step_over)
+      vim.keymap.set('n', '<F11>', dap.step_into)
+      vim.keymap.set('n', '<F12>', dap.step_out)
+      vim.keymap.set('n', '<leader>rc', dap.run_to_cursor)
+      vim.keymap.set('n', '<leader>b', dap.toggle_breakpoint)
+      vim.keymap.set('n', '<leader>B', dap.set_breakpoint)
+      vim.keymap.set('n', '<leader>lp', function()
+        dap.set_breakpoint(nil, nil, vim.fn.input 'Log point message: ')
       end)
-      vim.keymap.set('n', '<F10>', function()
-        require('dap').step_over()
+      vim.keymap.set('n', '<leader>?', function()
+        dapui.eval(nil, { enter = true })
       end)
-      vim.keymap.set('n', '<F11>', function()
-        require('dap').step_into()
-      end)
-      vim.keymap.set('n', '<F12>', function()
-        require('dap').step_out()
-      end)
-      vim.keymap.set('n', '<Leader>b', function()
-        require('dap').toggle_breakpoint()
-      end)
-      vim.keymap.set('n', '<Leader>B', function()
-        require('dap').set_breakpoint()
-      end)
-      vim.keymap.set('n', '<Leader>lp', function()
-        require('dap').set_breakpoint(nil, nil, vim.fn.input 'Log point message: ')
-      end)
-      vim.keymap.set('n', '<Leader>dr', function()
-        require('dap').repl.open()
-      end)
-      vim.keymap.set('n', '<Leader>dl', function()
-        require('dap').run_last()
-      end)
-      vim.keymap.set({ 'n', 'v' }, '<Leader>dh', function()
-        require('dap.ui.widgets').hover()
-      end)
-      vim.keymap.set({ 'n', 'v' }, '<Leader>dp', function()
-        require('dap.ui.widgets').preview()
-      end)
-      vim.keymap.set('n', '<Leader>df', function()
-        local widgets = require 'dap.ui.widgets'
-        widgets.centered_float(widgets.frames)
-      end)
-      vim.keymap.set('n', '<Leader>ds', function()
-        local widgets = require 'dap.ui.widgets'
-        widgets.centered_float(widgets.scopes)
-      end)
-    end,
-  },
+      vim.keymap.set('n', '<leader>dr', dap.repl.open)
+      vim.keymap.set('n', '<leader>dl', dap.run_last)
 
-  {
-    'rcarriga/nvim-dap-ui',
-    dependencies = { 'mfussenegger/nvim-dap', 'nvim-neotest/nvim-nio' },
-    config = function()
-      local dap, dapui = require 'dap', require 'dapui'
-      dapui.setup()
-      dap.listeners.before.attach.dapui_config = function()
-        dapui.open()
-      end
-      dap.listeners.before.launch.dapui_config = function()
-        dapui.open()
-      end
-      dap.listeners.before.event_terminated.dapui_config = function()
-        dapui.close()
-      end
-      dap.listeners.before.event_exited.dapui_config = function()
-        dapui.close()
-      end
+      dap.listeners.before.attach.dapui_config = dapui.open
+      dap.listeners.before.launch.dapui_config = dapui.open
+      dap.listeners.before.event_terminated.dapui_config = dapui.close
+      dap.listeners.before.event_exited.dapui_config = dapui.close
     end,
   },
 
@@ -794,7 +766,7 @@ require('lazy').setup {
     -- version = "*"
     config = function()
       require('neogen').setup {
-        vim.api.nvim_set_keymap('n', '<Leader>nf', ":lua require('neogen').generate()<CR>", { noremap = true, silent = true }),
+        vim.api.nvim_set_keymap('n', '<leader>nf', ":lua require('neogen').generate()<CR>", { noremap = true, silent = true }),
         languages = {
           ['cpp.doxygen'] = require 'neogen.configurations.cpp',
           ['python.numpydoc'] = require 'neogen.configurations.python',
