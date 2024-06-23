@@ -99,6 +99,8 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<M-,>', '<C-w>5<', { desc = 'Resize window thinner' })
+vim.keymap.set('n', '<M-.>', '<C-w>5>', { desc = 'Resize window wider' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -685,6 +687,7 @@ require('lazy').setup {
       'theHamsta/nvim-dap-virtual-text',
       'nvim-neotest/nvim-nio',
       'williamboman/mason.nvim',
+      'Weissle/persistent-breakpoints.nvim',
     },
     config = function()
       local dap = require 'dap'
@@ -696,6 +699,9 @@ require('lazy').setup {
         commented = true,
         highlight_changed_variables = true,
         show_stop_reason = true,
+      }
+      require('persistent-breakpoints').setup {
+        load_breakpoints_event = { 'BufReadPost' },
       }
 
       dap.adapters.gdb = {
@@ -731,7 +737,9 @@ require('lazy').setup {
       vim.keymap.set('n', '<F11>', dap.step_into)
       vim.keymap.set('n', '<F12>', dap.step_out)
       vim.keymap.set('n', '<leader>rc', dap.run_to_cursor)
-      vim.keymap.set('n', '<leader>b', dap.toggle_breakpoint)
+      vim.keymap.set('n', '<leader>b', require('persistent-breakpoints.api').toggle_breakpoint)
+      vim.keymap.set('n', '<leader>cb', require('persistent-breakpoints.api').set_conditional_breakpoint)
+      vim.keymap.set('n', '<leader>rb', require('persistent-breakpoints.api').clear_all_breakpoints)
       vim.keymap.set('n', '<leader>B', dap.set_breakpoint)
       vim.keymap.set('n', '<leader>lp', function()
         dap.set_breakpoint(nil, nil, vim.fn.input 'Log point message: ')
