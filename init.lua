@@ -598,7 +598,9 @@ require('lazy').setup {
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<C-y>'] = cmp.mapping.confirm {
+            select = true,
+          },
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
@@ -628,6 +630,7 @@ require('lazy').setup {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'buffer' },
         },
       }
     end,
@@ -688,6 +691,12 @@ require('lazy').setup {
       local dapui = require 'dapui'
 
       dapui.setup()
+      require('nvim-dap-virtual-text').setup {
+        enabled = true,
+        commented = true,
+        highlight_changed_variables = true,
+        show_stop_reason = true,
+      }
 
       dap.adapters.gdb = {
         type = 'executable',
@@ -717,6 +726,7 @@ require('lazy').setup {
         dap.disconnect { terminateDebuggee = true }
       end)
       vim.keymap.set('n', '<F5>', dap.continue)
+      vim.keymap.set('n', '<F7>', dap.restart)
       vim.keymap.set('n', '<F10>', dap.step_over)
       vim.keymap.set('n', '<F11>', dap.step_into)
       vim.keymap.set('n', '<F12>', dap.step_out)
