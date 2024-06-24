@@ -102,6 +102,8 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<M-,>', '<C-w>5<', { desc = 'Resize window thinner' })
+vim.keymap.set('n', '<M-.>', '<C-w>5>', { desc = 'Resize window wider' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -628,7 +630,9 @@ require('lazy').setup {
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<C-y>'] = cmp.mapping.confirm {
+            select = true,
+          },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
@@ -664,6 +668,7 @@ require('lazy').setup {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'buffer' },
         },
       }
     end,
@@ -712,6 +717,83 @@ require('lazy').setup {
   },
 
   {
+    'mfussenegger/nvim-dap',
+    dependencies = {
+      'rcarriga/nvim-dap-ui',
+      'theHamsta/nvim-dap-virtual-text',
+      'nvim-neotest/nvim-nio',
+      'williamboman/mason.nvim',
+      'Weissle/persistent-breakpoints.nvim',
+    },
+    config = function()
+      local dap = require 'dap'
+      local dapui = require 'dapui'
+
+      dapui.setup()
+      require('nvim-dap-virtual-text').setup {
+        enabled = true,
+        commented = true,
+        highlight_changed_variables = true,
+        show_stop_reason = true,
+      }
+      require('persistent-breakpoints').setup {
+        load_breakpoints_event = { 'BufReadPost' },
+      }
+
+      dap.adapters.gdb = {
+        type = 'executable',
+        command = 'gdb',
+        args = { '-i', 'dap' },
+      }
+      dap.configurations.cpp = {
+        {
+          name = 'Launch',
+          type = 'gdb',
+          request = 'launch',
+          program = function()
+            --return vim.fn.input('Path to executable: ', vim.cmd ':f' .. '/', 'file')
+            vim.cmd ':wa'
+            vim.cmd(':! make ' .. vim.fn.expand '%:t:r')
+            return vim.fn.expand '%:p:h' .. '/bin/debug/' .. vim.fn.expand '%:t:r' .. '.o'
+          end,
+          --           program = '${fileWorkspaceFolder}/bin/debug/${fileBaseNameNoExtension}.o',
+          cwd = '${workspaceFolder}',
+          stopAtBeginningOfMainSubprogram = false,
+        },
+      }
+      dap.configurations.c = dap.configurations.cpp
+
+      -- nvim-dap keymaps
+      vim.keymap.set('n', '<leader>dk', function()
+        dap.disconnect { terminateDebuggee = true }
+      end)
+      vim.keymap.set('n', '<F5>', dap.continue)
+      vim.keymap.set('n', '<F7>', dap.restart)
+      vim.keymap.set('n', '<F10>', dap.step_over)
+      vim.keymap.set('n', '<F11>', dap.step_into)
+      vim.keymap.set('n', '<F12>', dap.step_out)
+      vim.keymap.set('n', '<leader>rc', dap.run_to_cursor)
+      vim.keymap.set('n', '<leader>b', require('persistent-breakpoints.api').toggle_breakpoint)
+      vim.keymap.set('n', '<leader>cb', require('persistent-breakpoints.api').set_conditional_breakpoint)
+      vim.keymap.set('n', '<leader>rb', require('persistent-breakpoints.api').clear_all_breakpoints)
+      vim.keymap.set('n', '<leader>B', dap.set_breakpoint)
+      vim.keymap.set('n', '<leader>lp', function()
+        dap.set_breakpoint(nil, nil, vim.fn.input 'Log point message: ')
+      end)
+      vim.keymap.set('n', '<leader>?', function()
+        dapui.eval(nil, { enter = true })
+      end)
+      vim.keymap.set('n', '<leader>dr', dap.repl.open)
+      vim.keymap.set('n', '<leader>dl', dap.run_last)
+
+      dap.listeners.before.attach.dapui_config = dapui.open
+      dap.listeners.before.launch.dapui_config = dapui.open
+      dap.listeners.before.event_terminated.dapui_config = dapui.close
+      dap.listeners.before.event_exited.dapui_config = dapui.close
+    end,
+  },
+
+  {
     'stevearc/oil.nvim',
     opts = {},
     -- Optional dependencies
@@ -719,11 +801,11 @@ require('lazy').setup {
     config = function()
       require('oil').setup {
         default_file_explorer = true,
-        vim.keymap.set('n', '<Leader>ft', function()
-          vim.cmd 'vsplit | wincmd l'
-          require('oil').open()
-        end),
+        columns = { 'icon' },
+        view_options = { show_hidden = true },
       }
+      vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+      vim.keymap.set('n', '<Leader>-', require('oil').toggle_float, { desc = 'Open parent directory' })
     end,
   },
 
@@ -742,7 +824,7 @@ require('lazy').setup {
     -- version = "*"
     config = function()
       require('neogen').setup {
-        vim.api.nvim_set_keymap('n', '<Leader>nf', ":lua require('neogen').generate()<CR>", { noremap = true, silent = true }),
+        vim.api.nvim_set_keymap('n', '<leader>nf', ":lua require('neogen').generate()<CR>", { noremap = true, silent = true }),
         languages = {
           ['cpp.doxygen'] = require 'neogen.configurations.cpp',
           ['python.numpydoc'] = require 'neogen.configurations.python',
