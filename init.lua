@@ -633,7 +633,7 @@ require('lazy').setup {
           lsp_format = lsp_format_opt,
         }
       end,
->>>>>>> fork_origin
+
       formatters_by_ft = {
         lua = { 'stylua' },
         cpp = { 'clang_format' },
