@@ -31,6 +31,11 @@ vim.opt.showmode = false
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
 vim.opt.clipboard = 'unnamedplus'
+-- vim.keymap.set({ 'n', 'v' }, '<leader>y', '"+y', { noremap = true, silent = true, desc = 'Yank to system clipboard' })
+-- vim.keymap.set({ 'n', 'v' }, '<leader>yy', '"+yy', { noremap = true, silent = true, desc = 'Yank to system clipboard' })
+-- vim.keymap.set({ 'n', 'v' }, '<leader>Y', '"+Y', { noremap = true, silent = true, desc = 'Yank to system clipboard' })
+-- vim.keymap.set({ 'n', 'v' }, '<leader>p', '"+p', { noremap = true, silent = true, desc = 'Paste from system clipboard' })
+-- vim.keymap.set({ 'n', 'v' }, '<leader>P', '"+P', { noremap = true, silent = true, desc = 'Paste from system clipboard' })
 
 -- Enable break indent
 vim.opt.breakindent = true
