@@ -1,6 +1,5 @@
 -- :h syntax
 vim.opt.spelllang = 'en'
-vim.g.tex_fold_enabled = true
 vim.cmd 'highlight SpellBad cterm=bold,undercurl gui=bold,undercurl guisp=Red'
 vim.cmd 'highlight SpellCap cterm=bold gui=bold, guifg=LightBlue'
 vim.cmd 'highlight SpellRare cterm=italic gui=italic'
