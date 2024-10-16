@@ -1,10 +1,4 @@
 ---
----
----
----
----
----
----
 ----------------------------------------------------------------------------------------------
 --------------------- General ----------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -41,6 +35,12 @@ vim.cmd("filetype on")
 vim.cmd("filetype plugin on")
 vim.cmd("filetype indent on")
 
+vim.cmd("set expandtab")
+vim.cmd("set tabstop=4")
+vim.cmd("set softtabstop=4")
+vim.cmd("set shiftwidth=4")
+vim.opt.swapfile = false
+
 ---
 ----------------------------------------------------------------------------------------------
 --------------------- Search -----------------------------------------------------------------
@@ -64,12 +64,6 @@ vim.opt.inccommand = "split" -- Preview substitutions live, as you type!
 vim.keymap.set(
 	{ "n", "v", "x" },
 	"<leader>y",
-	'"+y',
-	{ noremap = true, silent = true, desc = "Yank to system clipboard" }
-)
-vim.keymap.set(
-	{ "n", "v", "x" },
-	"<leader>yy",
 	'"+y',
 	{ noremap = true, silent = true, desc = "Yank to system clipboard" }
 )
@@ -189,8 +183,11 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 	-- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
+	require("kickstart.autopairs"),
+	require("kickstart.lint"),
 	require("plugins.autocomplete"),
 	require("plugins.autoformat"),
+	require("plugins.autosave"),
 	require("plugins.autotabwidth"),
 	require("plugins.colorscheme"),
 	require("plugins.dap"),
@@ -198,13 +195,14 @@ require("lazy").setup({
 	require("plugins.gitsigns"),
 	require("plugins.lsp"),
 	require("plugins.md_headlines"),
+	require("plugins.mini"),
+	require("plugins.multi_cursor"),
 	require("plugins.neogen"),
 	require("plugins.oil"),
 	require("plugins.telescope"),
 	require("plugins.todo_comments"),
 	require("plugins.treesitter"),
+	require("plugins.vim_tmux_navigator"),
 	require("plugins.vimtex"),
 	require("plugins.which_key"),
-	require("plugins.mini"),
-	require("plugins.kickstart.autopairs"),
 })

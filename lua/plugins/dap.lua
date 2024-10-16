@@ -39,7 +39,7 @@ return {
 					return vim.fn.expand("%:p:h") .. "/bin/debug/" .. vim.fn.expand("%:t:r") .. ".o"
 				end,
 				cwd = "${workspaceFolder}",
-				stopAtBeginningOfMainSubprogram = false,
+				stopAtBeginningOfMainSubprogram = true,
 			},
 		}
 		dap.configurations.c = dap.configurations.cpp

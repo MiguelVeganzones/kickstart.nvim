@@ -1,4 +1,4 @@
-return { -- Autoformat
+return { -- Autoformattf
 	"stevearc/conform.nvim",
 	event = { "BufWritePre" },
 	cmd = { "ConformInfo" },

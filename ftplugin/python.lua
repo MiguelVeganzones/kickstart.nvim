@@ -1,6 +1,3 @@
-vim.opt.listchars:append 
-{
-	
-	leadmultispace = '|   '
-	
-}
+vim.opt.listchars:append({
+	leadmultispace = "|   ",
+})
