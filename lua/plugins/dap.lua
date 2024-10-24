@@ -33,13 +33,23 @@ return {
 				type = "gdb",
 				request = "launch",
 				program = function()
-					--return vim.fn.input('Path to executable: ', vim.cmd ':f' .. '/', 'file')
-					vim.cmd(":wa")
-					vim.cmd(":! make " .. vim.fn.expand("%:t:r"))
-					return vim.fn.expand("%:p:h") .. "/bin/debug/" .. vim.fn.expand("%:t:r") .. ".o"
+					return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
 				end,
+				-- program = function()
+				-- 	--return vim.fn.input('Path to executable: ', vim.cmd ':f' .. '/', 'file')
+				-- 	vim.cmd(":wa")
+				-- 	vim.cmd(":! make " .. vim.fn.expand("%:t:r"))
+				-- 	return vim.fn.expand("%:p:h") .. "/bin/debug/" .. vim.fn.expand("%:t:r") .. ".o"
+				-- end,
 				cwd = "${workspaceFolder}",
 				stopAtBeginningOfMainSubprogram = true,
+				setupCommands = {
+					{
+						text = "-enable-pretty-printing", -- GDB pretty printing
+						description = "enable pretty printing",
+						ignoreFailures = true,
+					},
+				},
 			},
 		}
 		dap.configurations.c = dap.configurations.cpp

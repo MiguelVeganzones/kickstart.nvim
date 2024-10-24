@@ -120,8 +120,8 @@ vim.opt.listchars = { -- Show unprintable symbols
 	precedes = "◄",
 	conceal = "▒",
 }
--- COlumn
-vim.opt.number = true -- Make relaitve line numbers default
+-- Column
+vim.opt.number = true -- Make relative line numbers default
 vim.opt.relativenumber = true
 vim.opt.signcolumn = "yes"
 

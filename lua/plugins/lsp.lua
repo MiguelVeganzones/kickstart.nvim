@@ -242,4 +242,13 @@ return {
 			})
 		end,
 	},
+	-- LSP for LaTeX (optional, using texlab)
+	{
+		"neovim/nvim-lspconfig",
+		config = function()
+			local lspconfig = require("lspconfig")
+			lspconfig.texlab.setup({}) -- Use texlab for LaTeX LSP
+		end,
+		ft = { "tex", "bib" }, -- Load only for LaTeX and BibTeX files
+	},
 }
